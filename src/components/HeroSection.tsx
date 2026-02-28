@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import heroPlantation from "@/assets/hero-plantation.jpg";
 import heroBeans from "@/assets/hero-beans.jpg";
 import heroRoasting from "@/assets/hero-roasting.jpg";
+import videoPlantation from "@/assets/video-plantation.mp4";
 
 const slides = [heroPlantation, heroBeans, heroRoasting];
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   const next = useCallback(() => {
     setCurrent((prev) => (prev + 1) % slides.length);
@@ -19,22 +21,38 @@ export default function HeroSection() {
 
   return (
     <section id="home" className="relative h-screen overflow-hidden">
-      {slides.map((src, i) => (
-        <div
-          key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            i === current ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <img
-            src={src}
-            alt="Coffee"
-            className={`w-full h-full object-cover ${
-              i === current ? "animate-zoom-in" : ""
+      {/* Video Background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        onLoadedData={() => setVideoLoaded(true)}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+          videoLoaded ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <source src={videoPlantation} type="video/mp4" />
+      </video>
+
+      {/* Fallback image slides (visible until video loads) */}
+      {!videoLoaded &&
+        slides.map((src, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              i === current ? "opacity-100" : "opacity-0"
             }`}
-          />
-        </div>
-      ))}
+          >
+            <img
+              src={src}
+              alt="Coffee"
+              className={`w-full h-full object-cover ${
+                i === current ? "animate-zoom-in" : ""
+              }`}
+            />
+          </div>
+        ))}
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-coffee-dark/60" />
